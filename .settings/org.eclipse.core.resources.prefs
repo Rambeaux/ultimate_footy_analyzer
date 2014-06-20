@@ -1,0 +1,17 @@
+#Fri Jun 20 23:20:00 EST 2014
+eclipse.preferences.version=1
+encoding//decisionscience/apps/input/migrations/0001_initial.py=utf-8
+encoding//decisionscience/apps/input/migrations/0002_views.py=utf-8
+encoding//decisionscience/apps/input/migrations/0003_devdata.py=utf-8
+encoding//decisionscience/apps/input/migrations/0004_storedprocedures.py=utf-8
+encoding//decisionscience/apps/input/migrations/0005_grant_privileges.py=utf-8
+encoding//decisionscience/apps/input/migrations/0006_staging_indexes.py=utf-8
+encoding//decisionscience/apps/input/migrations/0007_default_data_values.py=utf-8
+encoding//decisionscience/apps/input/util_migrations/0001_initial.py=utf-8
+encoding//decisionscience/apps/php_auth/migrations/0001_initial.py=utf-8
+encoding//decisionscience/apps/php_auth/migrations/0002_views.py=utf-8
+encoding//decisionscience/apps/php_auth/migrations/0003_devdata.py=utf-8
+encoding//decisionscience/apps/php_auth/migrations/0004_storedprocedures.py=utf-8
+encoding//decisionscience/apps/php_auth/migrations/0005_grant_privileges.py=utf-8
+encoding//ultimate_footy_analyzer/apps/player_scraper/migrations/0001_initial.py=utf-8
+encoding//ultimate_footy_analyzer/apps/player_scraper/migrations/0002_views.py=utf-8

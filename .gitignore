@@ -1,0 +1,14 @@
+# IDE project files
+.project
+.pydevproject
+.prefs
+
+# db files
+*.db
+
+# No PYC
+*.pyc
+*.swp
+
+# Postgres config file
+db_local.py

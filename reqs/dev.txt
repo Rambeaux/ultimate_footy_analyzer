@@ -1,0 +1,8 @@
+#-r dev.txt
+
+# -e git+https://github.com/django-nonrel/django.git#egg=django
+# -e git+https://github.com/django-nonrel/djangotoolbox.git#egg=djangotoolbox
+django-debug-toolbar==0.9.4
+ipdb==0.7
+ipython==0.13.2
+django-shell-plus==1.1.5
