@@ -165,10 +165,10 @@ manage.py migrate player_scraper
     
 
 #player performance
-manage.py scraper --df "file://localhost/Users/nathanielramm/Dropbox/dev/python/uf_scraper/fixtures/2014_playerperf_R13.html" --sn 2014 --or 14 --l 390252 --pt performance --action playerperf
+manage.py scraper --df "file://localhost/Users/nathanielramm/Dropbox/dev/python/ultimate_footy_analyzer/fixtures/2014_playerperf_R13.html" --sn 2014 --or 14 --l 390252 --pt performance --action playerperf
 
 #player projections
-manage.py scraper --df "file://localhost/Users/nathanielramm/Dropbox/dev/python/uf_scraper/fixtures/2014_playerproj_R12.html" --sn 2014 --or 12 --l 390252 --pt prediction --action playerperf
+manage.py scraper --df "file://localhost/Users/nathanielramm/Dropbox/dev/python/ultimate_footy_analyzer/fixtures/2014_playerproj_R12.html" --sn 2014 --or 12 --l 390252 --pt prediction --action playerperf
 
 #team updates    
 manage.py scraper --sn 2014 --l 390252 --action teamplayer --nt 12 --or 13  
@@ -200,9 +200,8 @@ class PlayerTeamSpider(ParentSpider):
 
     webbrowser = {}
 
-    def __init__(self, domain):
+    def __init__(self):
         
-        self.domain=domain
         self.verificationErrors = []
 
 

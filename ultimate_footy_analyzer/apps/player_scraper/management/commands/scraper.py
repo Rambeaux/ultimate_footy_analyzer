@@ -6,13 +6,13 @@ from optparse import make_option
 import numpy as np
 
 
-from uf_scraper.apps.player_scraper.models import  League, Team
+from ultimate_footy_analyzer.apps.player_scraper.models import  League, Team
 
 #models
-#from uf_scraper.apps.player_scraper.models import player
-from uf_scraper.apps.player_scraper.spiders.uf_spiders import PlayerPerformanceSpider, PlayerTeamSpider 
+#from ultimate_footy_analyzer.apps.player_scraper.models import player
+from ultimate_footy_analyzer.apps.player_scraper.spiders.uf_spiders import PlayerPerformanceSpider, PlayerTeamSpider 
 
-from uf_scraper.apps.player_scraper.framework.UFAnalysis import UF_TeamOptimiser#, UF_TradeOptimiser
+from ultimate_footy_analyzer.apps.player_scraper.framework.UFAnalysis import UF_TeamOptimiser#, UF_TradeOptimiser
 
 
 
@@ -48,7 +48,7 @@ class Command(BaseCommand):
     manage.py scraper --sn 2014 --l 309252 --action teamplayer --nt 12   
     
     #player performance
-    manage.py scraper --df "file://localhost/Users/nathanielramm/Dropbox/dev/python/uf_scraper/fixtures/2014_playerperf_R12.html" --sn 2014 --or 12 --l 309252 --pt performance --action playerperf    
+    manage.py scraper --df "file://localhost/Users/nathanielramm/Dropbox/dev/python/ultimate_footy_analyzer/fixtures/2014_playerperf_R12.html" --sn 2014 --or 12 --l 309252 --pt performance --action playerperf    
     """
 
     def handle(self, action=None, datafile=None, season=None, obsround=None, leagueid=None, performance_type=None, numteams=None, team_siteid = None, **options):
@@ -71,13 +71,10 @@ class Command(BaseCommand):
             objTeamOptimiser.initialise_team(teamid)
             objTeamOptimiser.get_player_performance(teamid) 
             objTeamOptimiser.select_team_positions(teamid, 'last5') 
-            
-
-            #print player_performances
-            
 
 
-
+        #action to store each league to be analysed in the database.
+        #all stored leagues will
         if action == "add_league":
 
             if leagueid <> None:
@@ -95,7 +92,8 @@ class Command(BaseCommand):
                 else:
                     log.msg("League {0} already in database".format(leagueid))
 
-
+        #load saved player performances
+        #TODO: dynamically scrape performances from web pag (requires login , however.
         if action == "playerperf":
 
 
@@ -118,7 +116,7 @@ class Command(BaseCommand):
             reactor.run()  # the script will block here until the spider is closed
             log.msg('Reactor login stopped.')        
         
-        
+        #Scrape the info for each team in each league
         if action == "teamplayer":
 
             if leagueid == None:
@@ -126,55 +124,48 @@ class Command(BaseCommand):
             else:
                 leagueid_list, found = League.objects.get(league_siteid=leagueid)
 
-            playerteam_spiders = {}
-            playerteam_crawlers = {}
+            #set up the spider
+            playerteam_spider = PlayerTeamSpider()
+            playerteam_spider.init(season, obsround, numteams)
 
-            #loop through leagues
-            for objLeague in leagueid_list:
-                
-                curr_leagueid = objLeague.league_siteid
-                numteams = objLeague.numteams
+            try:
 
-
-                try:
-
+                #loop through all stored leagues
+                for objLeague in leagueid_list:
+                    
+                    curr_leagueid = objLeague.league_siteid
+                    numteams = objLeague.numteams
+    
                     #loop through number of teams and add urls
                     base_url = "http://ultimate-footy.theage.com.au/{league_id}/{teamnum}"                 
-                    base_league_url = "http://ultimate-footy.theage.com.au/{league_id}".format(league_id=curr_leagueid)                 
-
-
-
-                    playerteam_spiders[curr_leagueid] = PlayerTeamSpider(domain=base_league_url)
-                    playerteam_spiders[curr_leagueid].init(season, obsround, numteams)
-        
                     
+                    #Add the link to each team in each league.
                     i=1
                     while i <= numteams:
                         
                         team_url = base_url.format(league_id=curr_leagueid, teamnum=str(i))
-                        playerteam_spiders[curr_leagueid].add_datafile(team_url)
-                        i +=1
-
-
-                    settings = get_project_settings()
-                    playerteam_crawlers[curr_leagueid] = Crawler(settings)
+                        playerteam_spider.add_datafile(team_url)
+                        i += 1
                     
-                    #log.msg(str(playerteam_spider.start_urls))
+                #setup and run the crawler
+                settings = get_project_settings()
+                playerteam_crawler = Crawler(settings)
                     
-                    playerteam_crawlers[curr_leagueid].signals.connect(reactor.stop, signal=signals.spider_closed)
-                    playerteam_crawlers[curr_leagueid].configure()
-                    playerteam_crawlers[curr_leagueid].crawl(playerteam_spiders[curr_leagueid])
-                    playerteam_crawlers[curr_leagueid].start()
-                    
-                except Exception, e:
-                    log.msg("Error Loading Teamplayer details {0}".format(str(e)))
-                    print(e)
-                    traceback.print_exc(file=sys.stdout)
+                playerteam_crawler.signals.connect(reactor.stop, signal=signals.spider_closed)
+                playerteam_crawler.configure()
+                playerteam_crawler.crawl(playerteam_spider)
+                playerteam_crawler.start()
+    
+                log.start()
+                log.msg('Running login reactor...')
+                
+                reactor.run()  # the script will block here until the spider is closed
+                log.msg('Reactor login stopped.')  
 
-            log.start()
-            log.msg('Running login reactor...')
-            
-            reactor.run()  # the script will block here until the spider is closed
-            log.msg('Reactor login stopped.')  
+            except Exception, e:
+                log.msg("Error Loading Teamplayer details {0}".format(str(e)))
+                print(e)
+                traceback.print_exc(file=sys.stdout)
+
 
        

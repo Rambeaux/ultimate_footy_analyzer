@@ -1,20 +1,18 @@
+#django
 from django.db import models
-from struct import pack
-import sys, traceback
 
+#project
+from ultimate_footy_analyzer.libs.Util import *
+
+#system
+import sys, traceback
 import numpy as np
 from datetime import datetime
-#import Class
-from ultimate_footy_analyzer.libs.Util import *
+from struct import pack
 
 
 """
-Note: To install Scrapy:
-if install fails, first install 'cryptography' package like so: 
-CFLAGS="-I/usr/include" pip install cryptography
 
-
-CFLAGS="-I/usr/include" pip install Twisted
 """
 
 class League(models.Model):
