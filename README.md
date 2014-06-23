@@ -13,8 +13,10 @@ Purpose
 
 Ultimate Footy analyser
 - imports player statistics
+- imports player status (named to play, 
 - imports league and team configurations
-- provides analysis of team and plyer performance
+- imports actual and projected player performances
+- provides analysis of team and player performance
 
 TODO
 ====
@@ -22,9 +24,32 @@ TODO
 - trade analyser & recommender
 - support multiple types of league
 
-Docs
+Usage
 ====
 
+The loading of player performances and projected performances requires the saving of html from the ultimate footy site.
+The scrapers are configured to read to the layout of the 'condensed' prinatable page for all players.
+
+- Actual Performance
+http://ultimate-footy.theage.com.au/{your_league_id}/players_print?type=condensed&l={your_league_id}&status=ALL&pos=P&club=ALL&stats=2014_PS_L24
+
+- Projected Performance
+http://ultimate-footy.theage.com.au/{your_league_id}/players_print?type=condensed&l={your_league_id}&status=ALL&pos=P&club=ALL&stats=2014_PS_L24
+
+
+To load data into the database run the following management commands:
+
+- to add a league to be managed. The league id is taken from the URL of your league page
+manage.py scraper  --action add_league --l {your_league_id}  --nt {number of teams in league} --sn {current_season}
+
+- to load actual player performance
+manage.py scraper --action playerperf --df "file://yourdir/condensed_player_perf_RoundX.html" --sn {current_season} --or {current/next round} --l {your_league_id} --pt performance 
+
+- to load projected player performance
+manage.py scraper --action playerperf--df "file://yourdir/condensed_player_proj_RoundX.html" --sn {current_season} --or {current/next round} --l {your_league_id} --pt prediction
+
+- to update team lists and player statuses (named to play, injuries, etc.). This may be run multiple times during the week as trades take place and Free Agents are drafted.
+manage.py scraper --sn 2014 --l {your_league_id} --action teamplayer  --or {current/next round}  
 
 
 Install
@@ -37,7 +62,6 @@ using ``virtualenvwrapper``
     $ git clone repo
     $ cd repo
     $ pip install -r reqs/dev.txt
-    $ pip install -r reqs/common.txt
     $ python manage.py player_scraper migrate
 ~~~
 
