@@ -48,10 +48,16 @@ class Command(BaseCommand):
     manage.py scraper --sn 2014 --l 309252 --action teamplayer --nt 12   
     
     #player performance
-    manage.py scraper --df "file://localhost/Users/nathanielramm/Dropbox/dev/python/ultimate_footy_analyzer/fixtures/2014_playerperf_R12.html" --sn 2014 --or 12 --l 309252 --pt performance --action playerperf    
+    manage.py scraper --df "file://localhost/Users/nathanielramm/Dropbox/dev/python/ultimate_footy_analyzer/fixtures/2014_playerperf_R15.html" --sn 2014 --or 12 --l 309252 --pt performance --action playerperf    
     """
 
     def handle(self, action=None, datafile=None, season=None, obsround=None, leagueid=None, performance_type=None, numteams=None, team_siteid = None, **options):
+
+
+
+        if leagueid <> None:
+            objLeague, created = League.objects.get_or_create(league_siteid=leagueid);
+            
 
         """======================
             Time windows
@@ -78,7 +84,6 @@ class Command(BaseCommand):
         if action == "add_league":
 
             if leagueid <> None:
-                
                 objLeague, created = League.objects.get_or_create(league_siteid=leagueid);
                 
                 if numteams <> None:
@@ -98,7 +103,7 @@ class Command(BaseCommand):
 
 
             playerperf_spider = PlayerPerformanceSpider()
-            playerperf_spider.init(season, obsround, performance_type)       
+            playerperf_spider.init(leagueid, season, obsround, performance_type)       
             playerperf_spider.add_datafile(datafile)
             
             settings = get_project_settings()
