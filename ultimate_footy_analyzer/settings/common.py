@@ -211,6 +211,7 @@ THIRD_PARTY_APPS = (
 
 LOCAL_APPS = (
     'apps.player_scraper',
+    'apps.django_pg_upload',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

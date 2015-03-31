@@ -171,7 +171,7 @@ manage.py scraper --df "file://localhost/Users/nathanielramm/Dropbox/dev/python/
 manage.py scraper --df "file://localhost/Users/nathanielramm/Dropbox/dev/python/ultimate_footy_analyzer/fixtures/2014_playerproj_R15.html" --sn 2014 --or 15 --l 390252 --pt prediction --action playerperf
 
 #team updates    
-manage.py scraper --sn 2014 --l 390252 --action teamplayer --nt 12 --or 13  
+manage.py scraper --sn 2014 --l 390252 --action teamplayer --nt 12 --or 15  
 
     
 """

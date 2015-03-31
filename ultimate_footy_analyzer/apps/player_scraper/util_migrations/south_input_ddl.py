@@ -25,7 +25,7 @@ class South_Input_DDL:
         objdb.start_transaction() 
         self.view_observationtime(objdb)
 
-        self.view_team_summary(objdb)
+        self.view_team_position_summary(objdb)
         self.view_team_player_summary_curr(objdb)
         self.view_player_performance_summary_current(objdb)
         self.view_player_projections_all(objdb) 
@@ -327,7 +327,7 @@ view_player_status_current pls
 
 left join
 (
-select pls1.player_siteid, pls1.league_id,
+select pls1.player_siteid, pls1.league_id
     ,SUM( CASE WHEN plp1.performance_round <= pls1.observation_round                                     then plp1.points ELSE null END) as sum_points
     ,AVG( CASE WHEN plp1.performance_round <= pls1.observation_round      and plp1.played = true         then plp1.points ELSE null END) as avg_points
     ,AVG( CASE WHEN plp1.performance_round >= pls1.observation_round - 3  and plp1.played = true         then plp1.points ELSE null END) as avg_points_l3
@@ -367,14 +367,15 @@ left join tbl_playerperformance plp1
     and pls1.observation_round >= plp1.performance_round
     and plp1.performance_type = 'performance'
 
-    group by pls1.player_siteid
+    group by pls1.player_siteid, pls1.league_id
 
 ) plp
 on plp.player_siteid = pls.player_siteid
+and plp.league_id = pls.league_id
 
 left join
 (
-select pls2.player_siteid
+select pls2.player_siteid, pls2.league_id
 
 ,AVG( CASE WHEN  pred2.performance_round = pls2.observation_round and pred2.prediction_round = pls2.observation_round then pred2.points ELSE null END) as avg_predpoints_n1
 ,AVG( CASE WHEN pred2.performance_round >= pls2.observation_round and pred2.performance_round < pls2.observation_round + 3   and pred2.prediction_round = pls2.observation_round  then pred2.points ELSE null END) as avg_predpoints_n3
@@ -389,24 +390,25 @@ left join tbl_playerperformance pred2
     and pred2.performance_type = 'prediction'
     and pred2.prediction_round = pls2.observation_round
 
-    group by pls2.player_siteid
+    group by pls2.player_siteid, pls2.league_id
 ) pred
-on pred.player_siteid = pls.player_siteid;
+on pred.player_siteid = pls.player_siteid
+and pred.league_id = pls.league_id;
     
         
     
 """)     
 
      
-    def view_team_summary(self, objdb):   
+    def view_team_position_summary(self, objdb):   
         
         objdb.execute(       
     """
     
-DROP VIEW IF EXISTS view_team_summary  CASCADE;
+DROP VIEW IF EXISTS view_team_position_summary  CASCADE;
     
 CREATE VIEW 
-view_team_summary as
+view_team_position_summary as
 select team_name, named_position, named_18, named_emergency, a.observation_round
 , count(a.*) as num_players
 , sum(avg_points) as tot_avg_points
@@ -425,13 +427,9 @@ t.team_name, tpp.named_position, tpp.named_18, tpp.named_emergency, ppsc.*
 
 from
     tbl_team t
-
---left join tbl_teamplayer tp
---    on t.team_id = t.team_id
     
 left join tbl_teamplayerposition tpp
     on t.team_id = tpp.team_id
-
 
 left join view_player_performance_summary_current ppsc
     on ppsc.player_id = tpp.player_id
@@ -442,6 +440,48 @@ group by team_name, named_position, named_18, named_emergency, a.observation_rou
 order by observation_round, team_name, named_position;
     
 """)     
+     
+     
+    def view_team_avgscore_summary(self, objdb):   
+        
+        objdb.execute(       
+    """
+    
+DROP VIEW IF EXISTS view_team_avgscore_summary  CASCADE;
+    
+CREATE VIEW 
+view_team_avgscore_summary as
+select tbla.team_name, tbla.league_id
+, count(tbla.*) as num_players
+, sum(CASE WHEN avg_points < 60 then 1 else null end) as numplayers_50s
+, sum(CASE WHEN avg_points >= 60 and avg_points < 70 then 1 else null end) as numplayers_60s
+, sum(CASE WHEN avg_points >= 70 and avg_points < 80 then 1 else null end) as numplayers_70s
+, sum(CASE WHEN avg_points >= 80 and avg_points < 90 then 1 else null end) as numplayers_80s
+, sum(CASE WHEN avg_points >= 90 and avg_points < 100 then 1 else null end) as numplayers_90s
+, sum(CASE WHEN avg_points >= 100 then 1 else null end) as numplayers_100s
+
+
+
+from (
+select
+ 
+t.team_name, tpp.named_position, tpp.named_18, tpp.named_emergency, ppsc.*
+
+from
+    tbl_team t
+    
+left join tbl_teamplayerposition tpp
+    on t.team_id = tpp.team_id
+
+left join view_player_performance_summary_current ppsc
+    on ppsc.player_id = tpp.player_id
+    --and ppsc.observation_round = tpp.observation_round
+
+) tbla
+group by tbla.team_name, tbla.league_id;
+    
+""")        
+     
      
     def view_team_player_summary_curr(self, objdb):   
         
