@@ -59,8 +59,8 @@ using ``virtualenvwrapper``
 ~~~
     $ mkvirtualenv uf_scraper
     $ workon uf_scraper
-    $ git clone repo
-    $ cd repo
+    $ git clone https://github.com/Rambeaux/ultimate_footy_analyzer
+    $ cd ultimate_footy_analyzer
     $ pip install -r reqs/dev.txt
     $ python manage.py player_scraper migrate
 ~~~

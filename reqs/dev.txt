@@ -1,4 +1,5 @@
-#-r dev.txt
+#dev.txt
+-r common.txt
 
 # -e git+https://github.com/django-nonrel/django.git#egg=django
 # -e git+https://github.com/django-nonrel/djangotoolbox.git#egg=djangotoolbox
